@@ -1,0 +1,4 @@
+{:+ {:app [(:lt.objs.plugins/load-js "ctags_compiled.js")]
+
+     :editor [:lt.plugins.ctags/on-result
+              :lt.plugins.ctags/go-to-tag]}}
