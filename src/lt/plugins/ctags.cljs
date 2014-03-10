@@ -42,18 +42,24 @@
       tags)
     (:ctags @ctags)))
 
-(defn select-tag [tags]
-  (first tags))
+(defn select-tag [ed tags]
+  (let [path (-> @ed :info :path)
+        ws-path (workspace-root path)
+        rel-path (clojure.string/replace-first path (str ws-path "/") "")
+        tags-matching-path (filter #(= rel-path (:path %)) tags)]
+    (if-not (empty? tags-matching-path)
+      (first tags-matching-path)
+      (first tags))))
 
 (defn lookup-tag [ed token]
   (let [tags  (load-tags ed)
         tag ((keyword token) tags)
         file-path (-> @ed :info :path)
-        path (str (workspace-root file-path) "/" (:path (select-tag tag)))]
+        path (str (workspace-root file-path) "/" (:path (select-tag ed tag)))]
     (if tag
-      (if (js/isNaN (js/parseInt (:ex (select-tag tag))))
+      (if (js/isNaN (js/parseInt (:ex (select-tag ed tag))))
         (search/search! ed {:search (str "/" token "/") :paths [path]})
-        (object/raise jump-stack/jump-stack :jump-stack.push! ed path {:line (dec (js/parseInt (:ex (select-tag tag)))) :ch 0}))
+        (object/raise jump-stack/jump-stack :jump-stack.push! ed path {:line (dec (js/parseInt (:ex (select-tag ed tag)))) :ch 0}))
       (notifos/set-msg! "Ctags: Definition not found" {:class "error"}))))
 
 (object/object* ::ctags
