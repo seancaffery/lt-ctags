@@ -1,4 +1,5 @@
 {:+ {:app [(:lt.objs.plugins/load-js "ctags_compiled.js")]
 
-     :editor [:lt.plugins.ctags/on-result
-              :lt.plugins.ctags/go-to-tag]}}
+     :editor [:lt.plugins.ctags/on-result]
+
+     :editor.ruby [:lt.plugins.ctags/ruby-namespaced-jump-to-definition]}}
