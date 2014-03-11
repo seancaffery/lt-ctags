@@ -30,14 +30,11 @@
   (if (empty? (:ctags @ctags))
     (let [lines (remove #(re-find #"^!" %) (clojure.string/split-lines
                                             (:content (files/open-sync (tags-file ed)))))
-          tags (reduce (fn [res l]
-                         (let [parts (clojure.string/split l #"\t")
-                               tag-key (keyword (first parts))]
-                           (if-not (vector? tag-key)
-                             (assoc res tag-key (vec [])))
-                           (assoc res tag-key
-                             (vec (conj (tag-key res) {:path (nth parts 1)
-                                                       :ex (nth parts 2) :type (nth parts 3)}))))) {} lines)]
+          tag-map (map (fn [line]
+                      (let [parts (clojure.string/split line #"\t")
+                            tag-key (keyword (first parts))]
+                        {:token tag-key :path (nth parts 1) :ex (nth parts 2) :type (nth parts 3)})) lines)
+          tags (group-by #(keyword (:token %))  tag-map)]
       (object/merge! ctags {:ctags tags})
       tags)
     (:ctags @ctags)))
