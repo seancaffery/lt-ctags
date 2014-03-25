@@ -33,7 +33,8 @@
           tag-map (map (fn [line]
                       (let [parts (clojure.string/split line #"\t")
                             tag-key (keyword (first parts))]
-                        {:token tag-key :path (nth parts 1)
+                        {:token tag-key
+                         :path (.replace (nth parts 1) #"^\./" "")
                          :ex (nth parts 2)
                          :type (nth parts 3)
                          :namespace (.replace (get parts 4 "") "class:" "")})) lines)
