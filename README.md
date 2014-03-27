@@ -24,7 +24,7 @@ You can add basic jump to definition to other editor types by
 adding the following to your behaviours file.
 
 ```
-:editor.ruby [:lt.plugins.ctags/simple-jump-to-definition]}}
+:editor.javascript [:lt.plugins.ctags/simple-jump-to-definition]}}
 ```
 
 ### Contributing
