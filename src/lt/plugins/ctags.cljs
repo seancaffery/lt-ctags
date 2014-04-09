@@ -79,14 +79,15 @@
                       (object/raise jump-stack/jump-stack :jump-stack.push! this path {:line (dec line) :ch 0}))))
 
 (defn simple-lookup [editor]
-  (lookup-tag this
+  (lookup-tag editor
               {:token (:string (editor/->token editor (editor/->cursor editor)))
                :namespace nil}))
 
 (behavior ::simple-jump-to-definition
           :triggers #{::go-to-tag :editor.jump-to-definition-at-cursor!}
           :desc "Ctags implementation of jump to definition"
-          :reaction simple-lookup)
+          :reaction (fn [this]
+                      (simple-lookup this)))
 
 (behavior ::ruby-namespaced-jump-to-definition
           :triggers #{::go-to-tag :editor.jump-to-definition-at-cursor!}
