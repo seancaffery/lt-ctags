@@ -1,5 +1,5 @@
 {:name "Ctags"
- :version "0.0.2"
+ :version "0.0.3"
  :author "Sean Caffery"
  :source "https://github.com/seancaffery/lt-ctags"
  :desc "Jump to defintion based on tags file"
