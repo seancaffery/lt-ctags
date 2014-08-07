@@ -18,8 +18,15 @@
 
 (defn tags-file [ed]
   (let [file-path (-> @ed :info :path)
-        path (str (workspace-root file-path) "/tags")]
+        relative-path (or (::ctags-tags-file-location ed) "/tags")
+        path (str (workspace-root file-path) relative-path)]
     path))
+
+;(tags-file (pool/last-active))
+;(::ctags-options)
+;(object/merge! (pool/last-active) {::ctags-tags-file-location "zomg"})
+;(keys @(pool/last-active))
+;(:lt.plugins.ctags/ctags-tags-file-location @(pool/last-active))
 
 (defn tags-file-exists? [ed]
   (let [tags-file (tags-file ed)
@@ -79,6 +86,7 @@
                       (object/raise jump-stack/jump-stack :jump-stack.push! this path {:line (dec line) :ch 0}))))
 
 (defn simple-lookup [editor]
+  (.log js/console (str (::ctags-tags-file-location @editor)))
   (lookup-tag editor
               {:token (:string (editor/->token editor (editor/->cursor editor)))
                :namespace nil}))
@@ -87,17 +95,30 @@
           :triggers #{::go-to-tag :editor.jump-to-definition-at-cursor!}
           :desc "Ctags implementation of jump to definition"
           :reaction (fn [this]
+                      (.log js/console (::ctags-tags-file-location this))
                       (simple-lookup this)))
 
 (behavior ::ruby-namespaced-jump-to-definition
           :triggers #{::go-to-tag :editor.jump-to-definition-at-cursor!}
           :desc "Ctags jump to definition with ruby namespacing"
           :reaction (fn [this]
+                      (.log js/console (::ctags-tags-file-location this))
                       (lookup-tag this
                                   {:token (-> (editor/->token this (editor/->cursor this))
                                               :string
                                               (.replace ":" ""))
                                    :namespace "FooBar.BazMan"})))
+
+(object/behavior* ::tags-file-location
+                  :triggers #{:object.instant}
+                  :type :user
+                  :desc "Ctags set tags file location relative to the workspace"
+                  :params [{:label "tags-file-location"
+                            :example ".config/tags"
+                            :type :clj}]
+                  :reaction (fn [this location]
+                              (.log js/console location)
+                              (object/merge! this {::ctags-tags-file-location location})))
 
 ; Not sure of this commands relevance, there's already an LT command
 ; to trigger the appropriate jump to definition behaviors
